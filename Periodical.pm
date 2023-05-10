@@ -21,7 +21,28 @@ sub _reconcile {
 		});
 	}
 
-	# TODO Other reconncilations like author and name and year if exist
+	# Name and year of publication.
+	if (exists $reconcilation_rules_hr->{'identifiers'}->{'name'}
+		&& exists $reconcilation_rules_hr->{'identifiers'}->{'year'}) {
+
+		my $year = $reconcilation_rules_hr->{'identifiers'}->{'year'};
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279' => 'Q1002697',
+			'P1476' => $reconcilation_rules_hr->{'identifiers'}->{'name'},
+			'P580' => '?start_time',
+			'P582' => '?end_time',
+		}, [
+			['?start_time', '<=', '"'.$year.'-31-12T00:00:00"^^xsd:dateTime'],
+			['?end_time', '>=', '"'.$year.'-01-01T00:00:00"^^xsd:dateTime'],
+		]);
+
+	# Name.
+	} elsif (exists $reconcilation_rules_hr->{'identifiers'}->{'name'}) {
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279' => 'Q1002697',
+			'P1476' => $reconcilation_rules_hr->{'identifiers'}->{'name'},
+		});
+	}
 
 	return @sparql;
 }
