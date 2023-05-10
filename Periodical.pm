@@ -44,6 +44,34 @@ sub _reconcile {
 		});
 	}
 
+	# Start and end time.
+	if (exists $reconcilation_rules_hr->{'identifiers'}->{'start_time'}
+		&& exists $reconcilation_rules_hr->{'identifiers'}->{'end_time'}) {
+
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279' => 'Q1002697',
+			'P580' => '?start_time',
+			'P582' => '?end_time',
+		}, [
+			['YEAR(?start_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'start_time'}],
+			['YEAR(?end_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'end_time'}],
+		]);
+	} elsif (exists $reconcilation_rules_hr->{'identifiers'}->{'start_time'}) {
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279' => 'Q1002697',
+			'P580' => '?start_time',
+		}, [
+			['YEAR(?start_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'start_time'}],
+		]);
+	} elsif (exists $reconcilation_rules_hr->{'identifiers'}->{'end_time'}) {
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279' => 'Q1002697',
+			'P582' => '?end_time',
+		}, [
+			['YEAR(?end_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'end_time'}],
+		]);
+	}
+
 	return @sparql;
 }
 
