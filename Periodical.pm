@@ -16,7 +16,7 @@ sub _reconcile {
 	# Reconcilation over external references.
 	foreach my $external_property_key (keys %{$reconcilation_rules_hr->{'external_identifiers'}}) {
 		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
-			'P31/P279' => 'Q1002697',
+			'P31/P279*' => 'Q1002697',
 			$external_property_key => $reconcilation_rules_hr->{'external_identifiers'}->{$external_property_key},
 		});
 	}
@@ -45,7 +45,7 @@ sub _reconcile {
 
 		my $year = $reconcilation_rules_hr->{'identifiers'}->{'year'};
 		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
-			'P31/P279' => 'Q1002697',
+			'P31/P279*' => 'Q1002697',
 			'P1476' => $reconcilation_rules_hr->{'identifiers'}->{'name'}.'@'.$self->{'language'},
 			'P580' => '?start_time',
 			'P582' => '?end_time',
@@ -59,7 +59,7 @@ sub _reconcile {
 	if (exists $reconcilation_rules_hr->{'identifiers'}->{'name'}) {
 		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
 			'P31/P279' => 'Q1002697',
-			'P1476' => $reconcilation_rules_hr->{'identifiers'}->{'name'},
+			'P1476' => $reconcilation_rules_hr->{'identifiers'}->{'name'}.'@'.$self->{'language'},
 		});
 	}
 
@@ -68,7 +68,7 @@ sub _reconcile {
 		&& exists $reconcilation_rules_hr->{'identifiers'}->{'end_time'}) {
 
 		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
-			'P31/P279' => 'Q1002697',
+			'P31/P279*' => 'Q1002697',
 			'P580' => '?start_time',
 			'P582' => '?end_time',
 		}, [
@@ -77,14 +77,14 @@ sub _reconcile {
 		]);
 	} elsif (exists $reconcilation_rules_hr->{'identifiers'}->{'start_time'}) {
 		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
-			'P31/P279' => 'Q1002697',
+			'P31/P279*' => 'Q1002697',
 			'P580' => '?start_time',
 		}, [
 			['YEAR(?start_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'start_time'}],
 		]);
 	} elsif (exists $reconcilation_rules_hr->{'identifiers'}->{'end_time'}) {
 		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
-			'P31/P279' => 'Q1002697',
+			'P31/P279*' => 'Q1002697',
 			'P582' => '?end_time',
 		}, [
 			['YEAR(?end_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'end_time'}],
