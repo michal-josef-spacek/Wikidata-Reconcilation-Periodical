@@ -1,4 +1,6 @@
 Changes
+examples/reconcile_periodical.pl
+examples/reconcile_periodical_verbose.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
