@@ -21,10 +21,10 @@ sub _reconcile {
 		});
 	}
 
-	# Name, start time and end time of periodical.
-	if (exists $reconcilation_rules_hr->{'identifiers'}->{'name'}
-		&& exists $reconcilation_rules_hr->{'identifiers'}->{'start_time'}
-		&& exists $reconcilation_rules_hr->{'identifiers'}->{'end_time'}) {
+	# Former periodical - name, start time and end time
+	if ($self->_exists_id($reconcilation_rules_hr, 'name')
+		&& $self->_exists_id($reconcilation_rules_hr, 'start_time')
+		&& $self->_exists_id($reconcilation_rules_hr, 'end_time')) {
 
 		my $start_time = $reconcilation_rules_hr->{'identifiers'}->{'start_time'};
 		my $end_time = $reconcilation_rules_hr->{'identifiers'}->{'end_time'};
@@ -37,11 +37,50 @@ sub _reconcile {
 			['?start_time', '=', '"'.$start_time.'-00-00T00:00:00"^^xsd:dateTime'],
 			['?end_time', '=', '"'.$end_time.'-00-00T00:00:00"^^xsd:dateTime'],
 		]);
+
+	# Actual periodical - name and start time.
+	} elsif ($self->_exists_id($reconcilation_rules_hr, 'name')
+		&& $self->_exists_id($reconcilation_rules_hr, 'start_time')) {
+
+		my $start_time = $reconcilation_rules_hr->{'identifiers'}->{'start_time'};
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279*' => 'Q1002697',
+			'P1476' => $reconcilation_rules_hr->{'identifiers'}->{'name'}.'@'.$self->{'language'},
+			'P580' => '?start_time',
+		}, [
+			['?start_time', '=', '"'.$start_time.'-00-00T00:00:00"^^xsd:dateTime'],
+		]);
+	# Start and end time.
+	} elsif ($self->_exists_id($reconcilation_rules_hr, 'start_time')
+		&& $self->_exists_id($reconcilation_rules_hr, 'end_time')) {
+
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279*' => 'Q1002697',
+			'P580' => '?start_time',
+			'P582' => '?end_time',
+		}, [
+			['YEAR(?start_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'start_time'}],
+			['YEAR(?end_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'end_time'}],
+		]);
+	} elsif ($self->_exists_id($reconcilation_rules_hr, 'start_time')) {
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279*' => 'Q1002697',
+			'P580' => '?start_time',
+		}, [
+			['YEAR(?start_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'start_time'}],
+		]);
+	} elsif ($self->_exists_id($reconcilation_rules_hr, 'end_time')) {
+		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
+			'P31/P279*' => 'Q1002697',
+			'P582' => '?end_time',
+		}, [
+			['YEAR(?end_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'end_time'}],
+		]);
 	}
 
 	# Name and year of publication.
-	if (exists $reconcilation_rules_hr->{'identifiers'}->{'name'}
-		&& exists $reconcilation_rules_hr->{'identifiers'}->{'year'}) {
+	if ($self->_exists_id($reconcilation_rules_hr, 'name')
+		&& $self->_exists_id($reconcilation_rules_hr, 'year')) {
 
 		my $year = $reconcilation_rules_hr->{'identifiers'}->{'year'};
 		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
@@ -56,39 +95,11 @@ sub _reconcile {
 	}
 
 	# Name.
-	if (exists $reconcilation_rules_hr->{'identifiers'}->{'name'}) {
+	if ($self->_exists_id($reconcilation_rules_hr, 'name')) {
 		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
 			'P31/P279' => 'Q1002697',
 			'P1476' => $reconcilation_rules_hr->{'identifiers'}->{'name'}.'@'.$self->{'language'},
 		});
-	}
-
-	# Start and end time.
-	if (exists $reconcilation_rules_hr->{'identifiers'}->{'start_time'}
-		&& exists $reconcilation_rules_hr->{'identifiers'}->{'end_time'}) {
-
-		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
-			'P31/P279*' => 'Q1002697',
-			'P580' => '?start_time',
-			'P582' => '?end_time',
-		}, [
-			['YEAR(?start_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'start_time'}],
-			['YEAR(?end_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'end_time'}],
-		]);
-	} elsif (exists $reconcilation_rules_hr->{'identifiers'}->{'start_time'}) {
-		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
-			'P31/P279*' => 'Q1002697',
-			'P580' => '?start_time',
-		}, [
-			['YEAR(?start_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'start_time'}],
-		]);
-	} elsif (exists $reconcilation_rules_hr->{'identifiers'}->{'end_time'}) {
-		push @sparql, WQS::SPARQL::Query::Select->new->select_value({
-			'P31/P279*' => 'Q1002697',
-			'P582' => '?end_time',
-		}, [
-			['YEAR(?end_time)', '=', $reconcilation_rules_hr->{'identifiers'}->{'end_time'}],
-		]);
 	}
 
 	return @sparql;
