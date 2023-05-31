@@ -24,7 +24,7 @@ $obj = Wikidata::Reconcilation::Periodical->new;
 });
 my $right_ret =<<'END';
 SELECT ?item WHERE {
-  ?item wdt:P31/wdt:P279 wd:Q1002697.
+  ?item wdt:P31/wdt:P279* wd:Q1002697.
   ?item wdt:P236 '1212-026X'.
 }
 END
