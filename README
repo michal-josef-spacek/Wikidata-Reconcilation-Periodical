@@ -1,6 +1,6 @@
 NAME
-    Wikidata::Reconcilation::Periodical - Abstract class for Wikidata
-    reconcilations.
+    Wikidata::Reconcilation::Periodical - Wikidata reconcilation class for
+    periodical.
 
 SYNOPSIS
      use Wikidata::Reconcilation::Periodical;

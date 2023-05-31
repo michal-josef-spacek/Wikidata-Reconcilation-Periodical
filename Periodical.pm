@@ -115,7 +115,7 @@ __END__
 
 =head1 NAME
 
-Wikidata::Reconcilation::Periodical - Abstract class for Wikidata reconcilations.
+Wikidata::Reconcilation::Periodical - Wikidata reconcilation class for periodical.
 
 =head1 SYNOPSIS
 
